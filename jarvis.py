@@ -14,6 +14,9 @@ import os
 import PyPDF2
 import cv2
 import PyQt5
+import bs4
+from bs4 import BeautifulSoup as soup
+from urllib.request import urlopen
 import random
 import webbrowser
 import sys
@@ -137,6 +140,21 @@ class MainThread(QThread):
 
             elif "close powerpoint" in self.query:
                 os.system("taskkill /f /im PowerPoint.exe")
+
+            elif "trending news" in self.query:
+                news_url="https://news.google.com/news/rss"
+                Client=urlopen(news_url)
+                xml_page=Client.read()
+                Client.close()
+
+                soup_page=soup(xml_page,"xml")
+                news_list=soup_page.findAll("item")
+                # Print news title, url and publish date
+                for news in news_list:
+                    self.speak(news.title.text)
+                    print(news.link.text)
+                    print(news.pubDate.text)
+                    print("-"*60)
 
             elif "do some calculations" in self.query:
                 response=['Welcome to smart calculator','Thanks for using me ','Sorry ,this is  beyond my ability']
